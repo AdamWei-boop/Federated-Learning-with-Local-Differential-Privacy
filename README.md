@@ -16,6 +16,5 @@ If you find "federated learning with DP" useful in your research, please conside
 Training
 =====
 
-
-Testing
+Neural nets
 =====
