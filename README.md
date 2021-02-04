@@ -15,8 +15,11 @@ If you find "federated learning with DP" useful in your research, please conside
     number={},
     pages={3454-3469},}
 
-Training
+Prerequisites
 -----
 
-Neural nets
+Data & Models
+-----
+
+Training
 -----
