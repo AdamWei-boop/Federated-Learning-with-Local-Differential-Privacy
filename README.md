@@ -18,8 +18,10 @@ If you find "federated learning with DP" useful in your research, please conside
 Prerequisites
 -----
 
-Data & Models
+Description
 -----
+###Models
+###Data
 
 Training
 -----
