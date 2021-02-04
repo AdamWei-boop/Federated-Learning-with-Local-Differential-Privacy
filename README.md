@@ -1,5 +1,7 @@
+Federated Learning with Differential Privacy
+======
 Citation
-=====
+-----
 If you find "federated learning with DP" useful in your research, please consider citing:
 
     @ARTICLE{Wei2020Fed,
@@ -14,7 +16,7 @@ If you find "federated learning with DP" useful in your research, please conside
     pages={3454-3469},}
 
 Training
-=====
+-----
 
 Neural nets
-=====
+-----
