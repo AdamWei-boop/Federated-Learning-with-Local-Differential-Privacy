@@ -1,4 +1,4 @@
-If you find federated learning with DP useful in your research, please consider citing:
+If you find "federated learning with DP" useful in your research, please consider citing:
 
     @ARTICLE{Wei2020Fed,
     author={Kang Wei and Jun Li and Ming Ding and Chuan Ma 
