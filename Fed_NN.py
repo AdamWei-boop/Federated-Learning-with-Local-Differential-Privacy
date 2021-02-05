@@ -2,28 +2,15 @@
 # -*- coding: utf-8 -*-
 # Python version: 3.6
 import time
-import argparse
 import matplotlib
-import sys
-import pylab
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 import os
 import copy
 import pandas as pd
-import math
-import numpy as np
 import random
 from torchvision import datasets, transforms
-from tqdm import tqdm
 import torch
-import torch.nn.functional as F
-from torch import autograd
 from tensorboardX import SummaryWriter
-from sympy import solve
-from sympy.abc import y
-import sympy as sy
-from scipy import optimize
 
 from sampling import mnist_iid, mnist_noniid, cifar_iid, cifar_noniid
 from options import args_parser
