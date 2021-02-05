@@ -26,7 +26,8 @@ If you find "federated learning with DP" useful in your research, please conside
 
 Prerequisites
 -----
-
+    Python >= 3.6
+    torch >= 1.5.1
 Models&Data
 -----
 
