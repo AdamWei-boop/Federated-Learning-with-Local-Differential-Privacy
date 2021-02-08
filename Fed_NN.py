@@ -201,19 +201,6 @@ def main(args):
                                                 threshold_epochs_list, iter)
                             noise_scale = copy.deepcopy(Privacy_account(args,\
                                         threshold_epochs, noise_list, iter))
-                        if args.dp_mechanism == 'NSD' and iter >= 1:
-                            noise_scale,eps_tot= Noise_TB_decay(args, noise_list,\
-                                    loss_avg_list, args.dec_cons, iter, 'UD')
-                            noise_list_next = copy.deepcopy(noise_list)
-                            noise_list_next.append(noise_scale)
-                            _,eps_tot_next= Noise_TB_decay(args, noise_list_next,\
-                                  loss_avg_list, args.dec_cons, iter+1, 'UD')
-                            
-                            eps_tot_list.append(eps_tot)
-
-                            if eps_tot_next > args.privacy_budget:
-                                threshold_epochs = 0
-                            print('\nTotal eps:',eps_tot_list,eps_tot_next)
                             
                         # print run time of each experiment
                         end_time = time.time()
@@ -279,7 +266,7 @@ if __name__ == '__main__':
 
     summary = SummaryWriter('local')
 	### differential privacy ###
-    args.dp_mechanism = 'NSD' ### NSD, CRD or Origi###
+    args.dp_mechanism = 'Origi' ### CRD or Origi###
     args.dec_cons = 0.8 ## discount constant
     # args.privacy_budget = 100
     args.delta = 0.01    
