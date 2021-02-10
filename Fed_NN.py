@@ -48,10 +48,10 @@ def main(args):
     if args.iid:
         dict_users = mnist_iid(dataset_train, args.num_users, args.num_items_train)
         # dict_users_test = mnist_iid(dataset_test, args.num_users, args.num_items_test) 
-        dict_sever = mnist_iid(dataset_test, args.num_users, args.num_items_test)
+        dict_server = mnist_iid(dataset_test, args.num_users, args.num_items_test)
     else:
         dict_users = mnist_noniid(dataset_train, args.num_users)
-        dict_sever = mnist_noniid(dataset_test, args.num_users)
+        dict_server = mnist_noniid(dataset_test, args.num_users)
 
     img_size = dataset_train[0][0].shape    
     
@@ -136,7 +136,7 @@ def main(args):
 
                         if iter >= 1 and args.para_est == True: 
                             w_locals_before = copy.deepcopy(w_locals_org)
-                        w_glob_before = copy.deepcopy(w_glob)
+                                                    
                         w_locals, w_locals_1ep, loss_locals, acc_locals = [], [], [], []
                         for idx in range(len(chosenUsers)):
                             local = LocalUpdate(args=args, dataset=dataset_train,\
@@ -149,20 +149,29 @@ def main(args):
                             loss_locals.append(copy.deepcopy(loss))
                             # print("User ", chosenUsers[idx], " Acc:", acc, " Loss:", loss)
                             acc_locals.append(copy.deepcopy(acc))
-                            
+
                         w_locals_org = copy.deepcopy(w_locals)
+                            
+                        #  estimate some paramters of the loss function
+                        if iter >= 2 and args.para_est == True: 
+                            Lipz_s,Lipz_c,delta,_,_,_,_,_=para_estimate(args,\
+                                        list_loss,loss_locals,w_locals_before,\
+                                            w_locals_org,w_glob_before,w_glob)
+                            print('Lipschitz smooth, lipschitz continuous, gradient divergence:',\
+                                  sum(Lipz_s)/len(Lipz_s),sum(Lipz_c)/len(Lipz_c),sum(delta)/len(delta))
                         
                         ### Clipping ###
                         for idx in range(len(chosenUsers)):
                             w_locals[idx] = copy.deepcopy(clipping(args, w_locals[idx]))
-                            # print(get_2_norm(w_locals[idx], w_glob))
+                            # print(get_2_norm(w_locals[idx], w_glob))                            
                             
                         ### perturb 'w_local' ###
                         w_locals = noise_add(args, noise_scale, w_locals)
                                                     
                         ### update global weights ###                
-                        # w_locals = users_sampling(args, w_locals, chosenUsers)
-                        w_glob = average_weights(w_locals) 
+                        ### w_locals = users_sampling(args, w_locals, chosenUsers) ###
+                        w_glob_before = copy.deepcopy(w_glob)                        
+                        w_glob = average_weights(w_locals)
                          
                         # copy weight to net_glob
                         net_glob.load_state_dict(w_glob)
@@ -171,7 +180,7 @@ def main(args):
                         net_glob.eval()
                         for c in range(args.num_users):
                             net_local = LocalUpdate(args=args,dataset=dataset_test,\
-                                                    idxs=dict_sever[idx], tb=summary)
+                                                    idxs=dict_server[c], tb=summary)
                             acc, loss = net_local.test(net=net_glob)                    
                             # acc, loss = net_local.test_gen(net=net_glob,\
                             # idxs=dict_users[c], dataset=dataset_test)
@@ -196,21 +205,29 @@ def main(args):
                         threshold_epochs_list.append(threshold_epochs)
                         print('\nNoise Scale:', noise_list)
                         print('\nThreshold epochs:', threshold_epochs_list)
+                        ### optimal method ###
                         if args.dp_mechanism == 'CRD' and iter >= 1:
                             threshold_epochs = Adjust_T(args, loss_avg_list,\
                                                 threshold_epochs_list, iter)
                             noise_scale = copy.deepcopy(Privacy_account(args,\
                                         threshold_epochs, noise_list, iter))
+                        if args.dp_mechanism == 'NSD' and iter >= 1:
+                            noise_scale,eps_tot= Noise_TB_decay(args, noise_list,\
+                                    loss_avg_list, args.dec_cons, iter, 'UD')
+                            noise_list_next = copy.deepcopy(noise_list)
+                            noise_list_next.append(noise_scale)
+                            _,eps_tot_next= Noise_TB_decay(args, noise_list_next,\
+                                  loss_avg_list, args.dec_cons, iter+1, 'UD')
+                            
+                            eps_tot_list.append(eps_tot)
+
+                            if eps_tot_next > args.privacy_budget:
+                                threshold_epochs = 0
+                            print('\nTotal eps:',eps_tot_list,eps_tot_next)
                             
                         # print run time of each experiment
                         end_time = time.time()
                         print('Run time: %f second' % (end_time - start_time))
-                        #  estimate some paramters of the loss function
-                        if iter >= 1 and args.para_est == True: 
-                            Lipz_s,Lipz_c,delta,_,_,_,_,_=para_estimate(args, list_loss, loss_locals, w_glob_before, w_locals_before,\
-                                          w_locals_org, w_glob)
-                            print('Lipschitz smooth, lipschitz continuous, gradient divergence:',\
-                                  Lipz_s,Lipz_c,delta)
                    
                         if iter >= threshold_epochs:
                             break
@@ -273,24 +290,25 @@ if __name__ == '__main__':
 
     args.gpu = -1               # -1 (CPU only) or GPU = 0
     args.lr = 0.002             # Learning rate
-    args.model = 'mlp'         # 'mlp' or 'cnn'
-    args.dataset = 'mnist'     # 'mnist'
-    args.num_users = 10         ### numb of users ###
+    args.model = 'mlp'          # 'mlp' or 'cnn'
+    args.dataset = 'mnist'      # 'mnist'
+    args.num_users = 10         # numb of users ###
     args.num_Chosenusers = 10
-    args.epochs = 100           # numb of global iters
-    args.local_ep = 5        # numb of local iters
-    args.num_items_train = 800 # numb of local data size # 
+    args.epochs = 3           # numb of global iters
+    args.local_ep = 5           # numb of local iters
+    args.num_items_train = 800  # numb of local data size # 
     args.num_items_test =  512
-    args.local_bs = 128         ### Local Batch size (1200 = full dataset ###
-                               ### size of a user for mnist, 2000 for cifar) ###
+    args.local_bs = 128         # Local Batch size (1200 = full dataset ###
+                                # size of a user for mnist, 2000 for cifar) ###
                                
-    args.set_privacy_budget = range(80000,240000,40000)
-    args.set_epochs = range(100,305,50)
+    args.set_privacy_budget = [8,100,1000]
+    args.set_epochs = [3]
     args.set_num_Chosenusers = [10]
-    args.set_dec_cons = [0.7,0.75,0.80,0.85,0.9,0.95]
+    args.set_dec_cons = [0.80]
     
-    args.num_experiments = 100
+    args.num_experiments = 1
     args.clipthr = 20
+    
     args.para_est = True
     args.iid = True
     
