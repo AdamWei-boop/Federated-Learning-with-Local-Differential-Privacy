@@ -17,7 +17,7 @@ from options import args_parser
 from Update import LocalUpdate
 from FedNets import MLP1, CNNMnist, CNN_test
 from averaging import average_weights
-from Privacy import  Privacy_account, Adjust_T, Noise_TB_decay
+from Privacy import  Privacy_account, Adjust_T
 from Noise_add import noise_add, users_sampling, clipping
 from Calculate import para_estimate
 
@@ -211,19 +211,6 @@ def main(args):
                                                 threshold_epochs_list, iter)
                             noise_scale = copy.deepcopy(Privacy_account(args,\
                                         threshold_epochs, noise_list, iter))
-                        if args.dp_mechanism == 'NSD' and iter >= 1:
-                            noise_scale,eps_tot= Noise_TB_decay(args, noise_list,\
-                                    loss_avg_list, args.dec_cons, iter, 'UD')
-                            noise_list_next = copy.deepcopy(noise_list)
-                            noise_list_next.append(noise_scale)
-                            _,eps_tot_next= Noise_TB_decay(args, noise_list_next,\
-                                  loss_avg_list, args.dec_cons, iter+1, 'UD')
-                            
-                            eps_tot_list.append(eps_tot)
-
-                            if eps_tot_next > args.privacy_budget:
-                                threshold_epochs = 0
-                            print('\nTotal eps:',eps_tot_list,eps_tot_next)
                             
                         # print run time of each experiment
                         end_time = time.time()
