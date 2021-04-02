@@ -36,20 +36,3 @@ def Adjust_T(args, loss_avg_list, threshold_epochs_list, iter):
         threshold_epochs = threshold_epochs_list[-1]
     return threshold_epochs
 
-def Noise_TB_decay(args, noise_list, loss_avg_list, dec_cons, iter, method_selected):
-    if loss_avg_list[-1]-loss_avg_list[-2]>=0:   
-        if method_selected == 'UD':
-            noise_scale = copy.deepcopy(noise_list[-1]*dec_cons)
-        elif method_selected == 'TBD': 
-            noise_scale = copy.deepcopy(noise_list[0]/(1+dec_cons*iter))
-        elif method_selected == 'ED':
-            noise_scale = copy.deepcopy(noise_list[0]*np.exp(-dec_cons*iter)) 
-    else:
-        noise_scale = copy.deepcopy(noise_list[-1])
-    q_s = args.num_Chosenusers/args.num_users
-    eps_tot = 0
-    for i in range(len(noise_list)):
-        eps_tot = copy.deepcopy(eps_tot + 1/pow(noise_list[i], 2))
-    eps_tot = copy.deepcopy(np.sqrt(eps_tot*2*q_s*np.log(1/args.delta)/pow(args.num_users,2)))
-    return noise_scale, eps_tot
-
