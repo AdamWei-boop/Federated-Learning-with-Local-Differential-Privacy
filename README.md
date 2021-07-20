@@ -38,7 +38,7 @@ Prerequisites
 Models&Data
 -----
     Learning models: CNN, MLP and SVM
-    Datasets: Cifar, Mnist and Adult
+    Datasets: Mnist and Adult
 Training
 -----
 
