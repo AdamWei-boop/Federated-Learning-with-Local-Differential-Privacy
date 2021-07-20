@@ -21,7 +21,6 @@ If you find "federated learning with local DP" useful in your research, please c
     volume={},
     number={},
     pages={1-1},}}
-    
 
     @ARTICLE{Ma202On,
     author={C. {Ma} and J. {Li} and M. {Ding} and H. H. {Yang} and F. {Shu} and T. Q. S. {Quek} and H. V. {Poor}},
@@ -38,7 +37,8 @@ Prerequisites
     Torch 1.5.1
 Models&Data
 -----
-
+    Learning models: CNN, MLP and SVM
+    Datasets: Cifar, Mnist and Adult
 Training
 -----
 
