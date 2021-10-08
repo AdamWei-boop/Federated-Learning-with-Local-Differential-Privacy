@@ -279,17 +279,17 @@ if __name__ == '__main__':
     args.lr = 0.002             # Learning rate
     args.model = 'mlp'          # 'mlp' or 'cnn'
     args.dataset = 'mnist'      # 'mnist'
-    args.num_users = 10         # numb of users ###
+    args.num_users = 10         # number of users ###
     args.num_Chosenusers = 10
-    args.epochs = 3           # numb of global iters
-    args.local_ep = 5           # numb of local iters
-    args.num_items_train = 800  # numb of local data size # 
+    args.epochs = 30           # number of global iters
+    args.local_ep = 1           # number of local iters
+    args.num_items_train = 800  # number of local data size # 
     args.num_items_test =  512
     args.local_bs = 128         # Local Batch size (1200 = full dataset ###
                                 # size of a user for mnist, 2000 for cifar) ###
                                
     args.set_privacy_budget = [8,100,1000]
-    args.set_epochs = [3]
+    args.set_epochs = [30]
     args.set_num_Chosenusers = [10]
     args.set_dec_cons = [0.80]
     
