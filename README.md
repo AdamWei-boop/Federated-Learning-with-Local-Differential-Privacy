@@ -39,8 +39,3 @@ Models&Data
 -----
     Learning models: CNN, MLP and SVM
     Datasets: Mnist and Adult
-Training
------
-
-Description
------
