@@ -105,8 +105,8 @@ def get_2_norm(params_a, params_b):
     norm = np.sqrt(sum)
     return norm
 
-def para_estimate(args, list_loss, loss_locals, w_glob_before, w_locals_before,\
-                  w_locals, w_glob):
+def para_estimate(args, list_loss, loss_locals, w_locals_before,\
+                  w_locals, w_glob_before, w_glob):
     Lipz_c = []
     Lipz_s = []
     beta = []
