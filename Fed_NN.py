@@ -273,7 +273,7 @@ if __name__ == '__main__':
     args.dp_mechanism = 'Origi' ### CRD or Origi###
     args.dec_cons = 0.8 ## discount constant
     # args.privacy_budget = 100
-    args.delta = 0.01    
+    args.delta = 0.001    
 
     args.gpu = -1               # -1 (CPU only) or GPU = 0
     args.lr = 0.002             # Learning rate
