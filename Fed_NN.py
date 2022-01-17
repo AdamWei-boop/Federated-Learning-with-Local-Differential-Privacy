@@ -281,8 +281,8 @@ if __name__ == '__main__':
     args.dataset = 'mnist'      # 'mnist'
     args.num_users = 10         # number of users ###
     args.num_Chosenusers = 10
-    args.epochs = 30           # number of global iters
-    args.local_ep = 1           # number of local iters
+    args.epochs = 30           	# number of global iters
+    args.local_ep = 10          # number of local iters
     args.num_items_train = 800  # number of local data size # 
     args.num_items_test =  512
     args.local_bs = 128         # Local Batch size (1200 = full dataset ###
