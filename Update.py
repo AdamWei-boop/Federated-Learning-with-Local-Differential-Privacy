@@ -8,6 +8,13 @@ from torch.utils.data import DataLoader, Dataset
 import numpy as np
 from sklearn import metrics
 import copy
+from opacus import PrivacyEngine
+
+import warnings
+
+warnings.filterwarnings("ignore")
+#matplotlib.use('Agg')
+
 #matplotlib.use('Agg')
 
 class DatasetSplit(Dataset):
@@ -49,6 +56,20 @@ class LocalUpdate(object):
         net.train()
         # train and update
         optimizer = torch.optim.SGD(net.parameters(), lr=self.args.lr, momentum=0)
+        
+        # use this module to clip gradients
+        privacy_engine = PrivacyEngine(
+            net,
+            sample_rate=0.01,
+            alphas=list(np.arange(1.01, 20.0, 0.02)),
+            noise_multiplier=0.0,
+            max_grad_norm=self.args.clipthr,
+            secure_rng = False,
+            target_epsilon=2,
+            target_delta = 1e-5,
+            epochs = 1,
+            )
+        privacy_engine.attach(optimizer) 
 
         epoch_loss = []
         epoch_acc = []

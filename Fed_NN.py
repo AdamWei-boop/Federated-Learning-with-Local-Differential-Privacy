@@ -19,7 +19,7 @@ from FedNets import MLP1, CNNMnist, CNN_test
 from averaging import average_weights
 from Privacy import  Privacy_account, Adjust_T
 from Noise_add import noise_add, users_sampling, clipping
-from Calculate import para_estimate
+from Calculate import para_estimate, subtract, add
 
 
 def main(args):
@@ -137,13 +137,14 @@ def main(args):
                         if iter >= 1 and args.para_est == True: 
                             w_locals_before = copy.deepcopy(w_locals_org)
                                                     
-                        w_locals, w_locals_1ep, loss_locals, acc_locals = [], [], [], []
+                        w_locals, w_locals_1ep, loss_locals, acc_locals, w_update_locals = [], [], [], [], []
                         for idx in range(len(chosenUsers)):
                             local = LocalUpdate(args=args, dataset=dataset_train,\
                                     idxs=dict_users[chosenUsers[idx]], tb=summary)
                             w_1st_ep, w, loss, acc = local.update_weights(\
                                                     net=copy.deepcopy(net_glob))
                             w_locals.append(copy.deepcopy(w))
+                            w_update_locals.append(subtract(w,w_glob))
                             ### get 1st ep local weights ###
                             w_locals_1ep.append(copy.deepcopy(w_1st_ep))            
                             loss_locals.append(copy.deepcopy(loss))
@@ -158,20 +159,14 @@ def main(args):
                                         list_loss,loss_locals,w_locals_before,\
                                             w_locals_org,w_glob_before,w_glob)
                             print('Lipschitz smooth, lipschitz continuous, gradient divergence:',\
-                                  sum(Lipz_s)/len(Lipz_s),sum(Lipz_c)/len(Lipz_c),sum(delta)/len(delta))
-                        
-                        ### Clipping ###
-                        for idx in range(len(chosenUsers)):
-                            w_locals[idx] = copy.deepcopy(clipping(args, w_locals[idx]))
-                            # print(get_2_norm(w_locals[idx], w_glob))                            
-                            
+                                  sum(Lipz_s)/len(Lipz_s),sum(Lipz_c)/len(Lipz_c),sum(delta)/len(delta))                       
                         ### perturb 'w_local' ###
-                        w_locals = noise_add(args, noise_scale, w_locals)
+                        w_update_locals = noise_add(args, noise_scale, w_update_locals)
                                                     
                         ### update global weights ###                
                         ### w_locals = users_sampling(args, w_locals, chosenUsers) ###
                         w_glob_before = copy.deepcopy(w_glob)                        
-                        w_glob = average_weights(w_locals)
+                        w_glob = add(w_glob, average_weights(w_update_locals))
                          
                         # copy weight to net_glob
                         net_glob.load_state_dict(w_glob)
@@ -276,25 +271,25 @@ if __name__ == '__main__':
     args.delta = 0.001    
 
     args.gpu = -1               # -1 (CPU only) or GPU = 0
-    args.lr = 0.002             # Learning rate
+    args.lr = 0.02             # Learning rate
     args.model = 'mlp'          # 'mlp' or 'cnn'
     args.dataset = 'mnist'      # 'mnist'
     args.num_users = 10         # number of users ###
     args.num_Chosenusers = 10
     args.epochs = 30           	# number of global iters
-    args.local_ep = 10          # number of local iters
+    args.local_ep = 1          # number of local iters
     args.num_items_train = 800  # number of local data size # 
     args.num_items_test =  512
     args.local_bs = 128         # Local Batch size (1200 = full dataset ###
                                 # size of a user for mnist, 2000 for cifar) ###
                                
-    args.set_privacy_budget = [8,100,1000]
-    args.set_epochs = [30]
+    args.set_privacy_budget = [10,100,1000]
+    args.set_epochs = [200]
     args.set_num_Chosenusers = [10]
     args.set_dec_cons = [0.80]
     
     args.num_experiments = 1
-    args.clipthr = 20
+    args.clipthr = 1.8
     
     args.para_est = True
     args.iid = True

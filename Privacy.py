@@ -14,7 +14,7 @@ from Calculate import f_zero
 
 def Privacy_account(args, threshold_epochs, noise_list, iter):
     q_s = args.num_Chosenusers/args.num_users
-    delta_s = 2*args.clipthr/args.num_items_train
+    delta_s = 2*args.lr*args.clipthr/args.num_items_train
     if args.dp_mechanism != 'CRD':
         noise_scale = delta_s*np.sqrt(2*q_s*threshold_epochs*np.log(1/args.delta))/args.privacy_budget
     elif args.dp_mechanism == 'CRD':

@@ -16,6 +16,18 @@ def inner_product(params_a, params_b):
                 params_b[i].cpu().numpy()))     
     return sum
 
+def subtract(params_a, params_b):
+    w = copy.deepcopy(params_a)
+    for k in w.keys():
+            w[k] = w[k] - params_b[k]
+    return w
+
+def add(params_a, params_b):
+    w = copy.deepcopy(params_a)
+    for k in w.keys():
+            w[k] += params_b[k]
+    return w
+
 
 def avg_grads(g):
     grad_avg = copy.deepcopy(g[0])
